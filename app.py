@@ -1,9 +1,8 @@
 import os
+import csv
 import openai
 import numpy as np
 import pandas as pd
-import json
-import matplotlib.pyplot as plt 
 import folium
 import streamlit as st
 import warnings

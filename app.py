@@ -15,6 +15,7 @@ from openai.embeddings_utils import get_embedding
 import faiss
 import warnings
 from PIL import Image
+import folium
 import streamlit as st
 import warnings
 from streamlit_option_menu import option_menu
@@ -24,9 +25,10 @@ import random
 from datetime import datetime, timedelta
 import requests
 import json
-import folium
+from streamlit_folium import st_folium
 from folium import plugins
 from folium.plugins import MarkerCluster
+import 
 
 warnings.filterwarnings("ignore")
 
@@ -292,6 +294,6 @@ elif options == "SalesX AI":
             cluster = plugins.MarkerCluster(locations=locations, icons=icons)
             map_loc.add_child(cluster)
             folium.plugins.HeatMap(heat_data).add_to(map_loc)
-            st.html(map_loc._repr_html_())
+            st.folium(map_loc, width=725)
 
 

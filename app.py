@@ -24,6 +24,9 @@ import random
 from datetime import datetime, timedelta
 import requests
 import json
+import folium
+from folium import plugins
+from folium.plugins import MarkerCluster
 
 warnings.filterwarnings("ignore")
 
@@ -235,9 +238,9 @@ if options == "Home":
 # About Us Page
 elif options == "About Me":
     st.title("About Me")
-    My_image = Image.open("images/photo-me1.jpg")
-    my_resized_image = My_image.resize((400,320))
-    st.image(my_resized_image)
+    #My_image = Image.open("images/photo-me1.jpg")
+    #my_resized_image = My_image.resize((400,320))
+    #st.image(my_resized_image)
     st.write("I am Jeremie Diaz, an AI builder and programmer.")
     st.write("Don't hesitate to contact me on my LinkedIn and check out my other projects on GitHub!")
     st.write("https://www.linkedin.com/in/jandiaz/")
@@ -257,25 +260,38 @@ elif options == "SalesX AI":
             data = pd.read_csv(uploaded_file)
             st.write("Data Preview:", data.head())
             # Create a dropdown for selecting the column to forecast
-            sales_column = st.selectbox("Select the column to forecast:", data.columns)
+            lat_column = st.selectbox("Select lattitude column:", data.columns)
+            long_column = st.selectbox("Select longitude column:", data.columns)
+            lat_long_column = data[[lat_column, long_column]]
     else:
         # Manual data entry
         st.write("Enter your sales data below:")
-        sales_data = st.text_area("Sales Data (comma-separated, e.g., 100, 150, 200)", "")
-        if sales_data:
-            sales_list = [float(x) for x in sales_data.split(",")]
-            data = pd.DataFrame({'Sales': sales_list})
-            sales_column = 'Sales'  # Set default sales column for manual entry
+        lat_data = st.text_area("Sales Data (comma-separated, e.g., -10, 15, 20)", "")
+        long_data = st.text_area("Sales Data (comma-separated, e.g., 10, -15, -20)", "")
+        lat_long_data = data[[lat_data, long_data]]
+        
+        if lat_long_data:
+            lat_long_list = [float(x) for x in lat_long_data.split(",")]
+            data = pd.DataFrame({'Location': lat_long_list})
+            location_column = 'Location'  # Set default sales column for manual entry
 
-    if 'data' in locals() and 'sales_column' in locals():
-        if st.button("Forecast Sales"):
-            forecast = forecast_sales(data, sales_column)
-            st.write("Forecasted Sales:", forecast)
+    if 'data' in locals() and 'location_column' in locals():
+        if st.button("Show Locations"):
+            locations = locations_data(data, location_column)
+            st.write("Show Locations:", locations)
 
             #explanation = generate_explanation(data, forecast)
             #st.write("Explanation:", explanation)
 
             # Visualization
-            st.header("Forecast Sales Chart")
-            st.line_chart(forecast)
-            
+            st.header("Location Map")
+            heat_data = list(zip(data.lat_column, data.long_column))
+            map_loc = folium.Map(location=[30, -100], tiles='OpenStreetMap', zoom_start=4, width="%100", height="%100")
+            locations = heat_data
+            icons = [folium.Icon(color='green', icon='fa-solid fa-house-user', prefix='fa') for i in range(len(locations))]
+            cluster = plugins.MarkerCluster(locations=locations, icons=icons)
+            map_loc.add_child(cluster)
+            folium.plugins.HeatMap(heat_data).add_to(map_loc)
+            st.html(map_loc._repr_html_())
+
+

@@ -28,7 +28,6 @@ import json
 from streamlit_folium import st_folium
 from folium import plugins
 from folium.plugins import MarkerCluster
-import 
 
 warnings.filterwarnings("ignore")
 
